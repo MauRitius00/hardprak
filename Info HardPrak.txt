@@ -1,0 +1,5 @@
+Info HardPrak
+
+cd /home/felix/Programme
+chmod +x arduino-ide_*.AppImage
+./arduino-ide_*.AppImage
