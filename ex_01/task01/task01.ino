@@ -11,6 +11,9 @@
 // ------------------------------------------------------------
 unsigned long last_blink_ms = 0;  // timestamp of the last LED toggle
 bool          led_on        = false; // current LED state
+int currentColor = 0;
+int cycle = 0;
+int color[] = {LED_RED, LED_GREEN, LED_BLUE};
 
 // TODO (Bonus): add a counter for completed blink cycles
 //               and a variable to track the current colour
@@ -20,9 +23,13 @@ void setup() {
   Serial.begin(115200);
   while (!Serial);
   // Set LED pins as outputs.
-  pinMode(LED_GREEN, OUTPUT);
+  for (int i=0; i<=2; i++) {
+    pinMode(color[i], OUTPUT);
+    digitalWrite(color[currentColor], HIGH);
+  }
   // configures a pin for digital output
   // Start with all LEDs off (active-low → HIGH = off)
+  last_blink_ms = millis();
 }
 
 
@@ -38,10 +45,11 @@ void loop() {
   //       turn LED_RED off,
   //       wait BLINK_INTERVAL_MS ms.
 
-  digitalWrite(LED_GREEN, LOW);
-  delay(BLINK_INTERVAL_MS);
-  digitalWrite(LED_GREEN, HIGH);
-  delay(BLINK_INTERVAL_MS);
+  //digitalWrite(LED_RED, LOW);
+  //delay(BLINK_INTERVAL_MS);
+  //digitalWrite(LED_RED, HIGH);
+  //delay(BLINK_INTERVAL_MS);
+
   // ----------------------------------------------------------
   //  Task 1 ii) — Blink using millis()  (comment out i) first)
   //
@@ -50,10 +58,18 @@ void loop() {
   // TODO: if yes — update last_blink_ms, toggle led_on,
   //               and write the correct HIGH/LOW to LED_RED.
 
+  //if (millis() - last_blink_ms >= BLINK_INTERVAL_MS) {
+  //  last_blink_ms = millis();
+  //  digitalWrite(LED_RED, !digitalRead(LED_RED));
+  //}
 
   // ----------------------------------------------------------
   //  Task 1 iii) — Answer as a comment
   // ----------------------------------------------------------
+  // Bei delay(); können während der Pause keine anderen Programmteile 
+  // ausgeführt werden, da das komplette programm pausiert wird. Dies
+  // ist bei II) mit der millis(); Funktion möglich, da das Programm
+  // weiterhin ausgeführt wird.
 
   // ----------------------------------------------------------
   //  Bonus — Colour cycling after 10 blink cycles
@@ -63,4 +79,19 @@ void loop() {
   //         red → green → blue → red → ...
   //       Turn off all LEDs before switching, then turn on only
   //       the new active colour.
+
+    if (millis() - last_blink_ms >= BLINK_INTERVAL_MS) {
+      last_blink_ms = millis();
+      digitalWrite(color[currentColor], !digitalRead(color[currentColor]));
+
+      if (digitalRead(color[currentColor])) {
+        cycle++;
+        if (cycle >= 10) {
+            cycle = 0;
+            digitalWrite(color[currentColor], HIGH);
+            currentColor = (currentColor + 1) % 3;
+        }
+      }
+    }
+
 }
