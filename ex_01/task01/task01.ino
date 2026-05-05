@@ -17,10 +17,10 @@ bool          led_on        = false; // current LED state
 
 
 void setup() {
-  // Serial.begin(115200);
-  // while (!Serial);
+  Serial.begin(115200);
+  while (!Serial);
   // Set LED pins as outputs.
-  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
   // configures a pin for digital output
   // Start with all LEDs off (active-low → HIGH = off)
 }
@@ -38,9 +38,9 @@ void loop() {
   //       turn LED_RED off,
   //       wait BLINK_INTERVAL_MS ms.
 
-  digitalWrite(LED_RED, LOW);
+  digitalWrite(LED_GREEN, LOW);
   delay(BLINK_INTERVAL_MS);
-  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_GREEN, HIGH);
   delay(BLINK_INTERVAL_MS);
   // ----------------------------------------------------------
   //  Task 1 ii) — Blink using millis()  (comment out i) first)
