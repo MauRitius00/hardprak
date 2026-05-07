@@ -5,6 +5,15 @@
 
 // Task 2 ii.) Constants — fill in the correct values from the datasheet
 //             You can also write the answers to the questions here.
+//– Which address belongs to the SGP30?
+// => 0x58
+//– What is the two-byte command code for initialization?
+// => 0x2003
+//– What is the two-byte command code for measurement?
+// => 0x2008
+//– How many bytes does a measurement response contain? What does each byte represent?
+// => 6 bytes. 1 byte Most Significant Byte (MSB), 1 byte Least Significant Byte (LSB),
+//    1 byte CRC, 1 byte MSB, 1 byte LSB, 1 byte CRC
 // ------------------------------------------------------------
 
 #define SGP30_ADDR       0x00   // 7-bit I2C address of the SGP30 
@@ -125,6 +134,16 @@ void setup() {
   // TODO: Transmit to each available I2C address, print the adress when receiving an ACK.
   //       You can use decimal adresses when sending but convert them to hex when printing them out.
   //       Use Serial.print(address, HEX) to make it easier.
+
+  Wire.begin();
+  for(int address = 7; address < 128; address++){
+    Wire.beginTransmission(address);
+    int error = Wire.endTransmission();
+    if(error == 0){
+      Serial.print("0x");
+      Serial.println(address, HEX);
+    }
+  }
 
   //     Task 2 iv.): Initialise SGP30 
   // TODO: send the init command, wait for initialization
