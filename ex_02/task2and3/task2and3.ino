@@ -27,12 +27,7 @@ void setup() {
 
 
 void loop() {
-  if (! (NRF_P0->IN) & (1UL << 3)) {
-    NRF_TIMER1->TASKS_START = 1;
-    NVIC_EnableIRQ(TIMER1_IRQn);
-  }
-  NVIC_DisableIRQ(TIMER1_IRQn);
-  NRF_TIMER1->TASKS_STOP = 1;
+  setBuzzerFreq();
 }
 
 
@@ -60,7 +55,12 @@ void setP029(bool high) {
 }
 
 void setBuzzerFreq() {
-
+  if (! (NRF_P0->IN) & (1UL << 3)) {
+  NRF_TIMER1->TASKS_START = 1;
+  NVIC_EnableIRQ(TIMER1_IRQn);
+  }
+  NVIC_DisableIRQ(TIMER1_IRQn);
+  NRF_TIMER1->TASKS_STOP = 1;
 }
 
 
