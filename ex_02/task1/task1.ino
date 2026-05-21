@@ -12,8 +12,6 @@ unsigned long last_blink_ms = 0;
 bool input = 0;
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial);
 
   last_blink_ms = millis();
    
