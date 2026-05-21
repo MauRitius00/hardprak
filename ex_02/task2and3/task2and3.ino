@@ -50,7 +50,7 @@ void setTimer1Freq() {
 
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
 
-  NRF_TIMER1->INTENSET = TIMER_INTENSET_COMPARE0_Msk;
+  NRF_TIMER1->INTENSET = (1UL << 16);
 
 
   NVIC_ClearPendingIRQ(TIMER1_IRQn);
@@ -66,6 +66,7 @@ void setP029(bool high) {
 }
 
 void setBuzzerFreq() {
+  // True if button pressed
   bool buttonPressed = ((NRF_P0->IN & (1UL << 3)) == 0);
 
   if (buttonPressed && !buzzerRunning) {
@@ -96,9 +97,6 @@ void setBuzzerFreq() {
 extern "C" void TIMER1_IRQHandler() {
   if (NRF_TIMER1->EVENTS_COMPARE[0]) {
     NRF_TIMER1->EVENTS_COMPARE[0] = 0;
-
-    volatile uint32_t dummy = NRF_TIMER1->EVENTS_COMPARE[0];
-    (void)dummy;
 
     currentToggleState = !currentToggleState;
     setP029(currentToggleState);
