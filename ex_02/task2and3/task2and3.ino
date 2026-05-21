@@ -1,5 +1,4 @@
-#include <Adafruit_TinyUSB.h>
-#define FREQUENCY  1046UL
+
 
 // ------------------------------------------------------------
 //  Task 2 and 3:
@@ -18,6 +17,8 @@ void setup() {
   NRF_TIMER1->PRESCALER = 4;
   NRF_TIMER1->BITMODE = 3;
   NRF_TIMER1->MODE = 0;
+
+  NRF_P0->DIRCLR = (1UL << 3);
   
 
   setTimer1Freq();
@@ -26,18 +27,22 @@ void setup() {
 
 
 void loop() {
-
+  if (! (NRF_P0->IN) & (1UL << 3)) {
+    NRF_TIMER1->TASKS_START = 1;
+    NVIC_EnableIRQ(TIMER1_IRQn);
+  }
+  NVIC_DisableIRQ(TIMER1_IRQn);
+  NRF_TIMER1->TASKS_STOP = 1;
 }
 
 
 
 void setTimer1Freq() {
   // read from timer1 and interrupt
-  NRF_TIMER1->CC[0] = 1000000 / (2 * 1046);
+  NRF_TIMER1->CC[0] = 1000000UL / (2 * 1046UL);
   NRF_TIMER1->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Msk;
   NRF_TIMER1->INTENSET = TIMER_INTENSET_COMPARE0_Msk;
 
-  // NVIC_ClearPendingIRQ(TIMER1_IRQn);
   NVIC_EnableIRQ(TIMER1_IRQn);
   
 }
@@ -62,6 +67,8 @@ void setBuzzerFreq() {
 extern "C" void TIMER1_IRQHandler() {
   if (NRF_TIMER1->EVENTS_COMPARE[0]) {
     NRF_TIMER1->EVENTS_COMPARE[0] = 0;
+
+    volatile uint32_t dummy = NRF_TIMER1->EVENTS_COMPARE[0];
   
     setP029(currenttogglestate);
     currenttogglestate = ! currenttogglestate;
