@@ -258,9 +258,7 @@ bool parseRTTLNote(char *buf, uint16_t *idx) {
 
   // determines the speed of the song as specified in the exercise sheet
   // uint32_t durationMs = 480000UL / ((uint32_t)standardBPM * noteDuration); // half the speed
-  // uint32_t durationMs = 240000UL / ((uint32_t)standardBPM * noteDuration);
-
-  uint32_t durationMs = 120000UL / ((uint32_t)standardBPM * noteDuration);
+  uint32_t durationMs = 240000UL / ((uint32_t)standardBPM * noteDuration);
 
   // add half a note
   if (buf[*idx] == '.') {

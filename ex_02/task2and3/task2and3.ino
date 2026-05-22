@@ -4,6 +4,8 @@
 // Task 2 and 3:
 // ------------------------------------------------------------
 
+// YOU HAVE TO PRESS THE BUTTON TO HEAR THE SOUND!! 
+
 volatile bool currentToggleState = false; // for ISR to generate Frequence
 bool buzzerRunning = false; // to work with button task 3
 

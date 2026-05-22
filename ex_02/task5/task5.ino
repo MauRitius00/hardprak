@@ -6,6 +6,7 @@
 //      Implement the ISR in TIMER2_IRQHandler().
 // ------------------------------------------------------------
 
+// PRINTS TO THE SERIAL MONITOR!!!!
 
 // we did the same as in task 2, but with Timer2
 #include <Adafruit_TinyUSB.h>
