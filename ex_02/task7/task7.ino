@@ -20,6 +20,7 @@ const uint16_t notes[] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466,
 char buffer[] = "Test:d=4,o=5,b=200:8g,8a,8c6,8a,e6,8p,e6,8p,d6.,8p,8g,8a,8c6,8a,d6,8p,d6,8p,c6,8p,a.,8g,8a,8c6,8a,2c6,d6,b,a,g.,8p,g,2d6,2c6.,p,8g,8a,8c6,8a,e6,8p,e6,8p,d6.,8p,8g,8a,8c6,8a,g6,b,c6,8p,b,8a,p,8g,8a,8c6,8a,2c6,d6,b,a,g,p,g,d6,c6";
 
 char song1[] = "GoodSong1:d=4,o=4,b=112:c,d#,f.,c,d#,8f#,f,p,c,d#,f.,d#,c";
+char emptySong[] = "empty"; // test case without melody
 char song2[] = "GoodSong2:o=5,d=4,b=320,b=320:c,8d,8d,d,2d,c,c,c,c,8d#,8d#,2d#,d,d,d,c,8d,8d,d,2d,c,c,c,c,8d#,8d#,d#,2d#,d,c#,c,c6,1b.,g,f,1g.";
 char song3[] = "GoodSong3:o=5,d=8,b=112,b=112:d,d,a,d,e6,d,d6,d,f#,g,c6,f#,g,c6,e,d,d,d,a,d,e6,d,d6,d,f#,g,c6,f#,g,c6,e,d,c,d,a,d,e6,d,d6,d,f#,g,c6,f#,g,c6,e,d,c,d,a,d,e6,d,d6,d,a,d,e6,d,d6";
 char song4[] = "GoodSong4:o=5,d=8,b=125,b=125:16g,16g,a#.,16g,16p,16g,c6,g,f,4g,d6.,16g,16p,16g,d#6,d6,a#,g,d6,g6,16g,16f,16p,16f,d,a#,2g,4p,16f6,d6,c6,a#,4g,a#.,16g,16p,16g,c6,g,f,4g,d6.,16g,16p,16g,d#6,d6,a#,g,d6,g6,16g,16f,16p,16f,d,a#,2g";
@@ -31,9 +32,11 @@ char song9[] = "GoodSong9:o=4,d=8,b=125,b=125:c6,c6,a#5,c6,p,g5,p,g5,c6,f6,e6,c6
 char song10[] = "GoodSong10:o=5,d=8,b=160,b=160:c#6,a#,2p,a#,g#,f#,g#,a#,4c#6,a#,4c#6,d#6,a#,2p,a#,g#,f#,g#,a#,4c#6,a#,4c#6,d#6,b,2p,b,a#,g#,a#,b,4d#6,f#6,4d#6,4f6.,4d#6.,4c#6.,4b.,4a#,4g#";
 char song11[] = "GoodSong11:o=5,d=16,b=125,b=125:b,a,4b,4e,4p,8p,c6,b,8c6,8b,4a,4p,8p,c6,b,4c6,4e,4p,8p,a,g,8a,8g,8f#,8a,4g.,f#,g,4a.,g,a,8b,8a,8g,8f#,4e,4c6,2b.,b,c6,b,a,1b";
 
+
 char *songs[] = {
   buffer,
   song1,
+  emptySong,
   song2,
   song3,
   song4,
@@ -157,7 +160,7 @@ void parseRTTTL(char *buf) {
 
   copySongName(buf);
 
-  while (buf[idx] != '\0' && buf[idx] != ':') {
+  while (*(buf + idx) != '\0' && buf[idx] != ':') {
     idx++;
   }
 
@@ -165,7 +168,7 @@ void parseRTTTL(char *buf) {
     idx++;
   }
 
-  while (buf[idx] != '\0' && buf[idx] != ':') {
+  while (buf[idx] != '\0' && *(buf + idx) != ':') {
     char param = lowerChar(buf[idx]);
     idx++;
 
@@ -183,12 +186,12 @@ void parseRTTTL(char *buf) {
       standardBPM = val;
     }
 
-    if (buf[idx] == ',') {
+    if (*(buf + idx) == ',') {
       idx++;
     }
   }
 
-  if (buf[idx] == ':') {
+  if (*(buf + idx) == ':') {
     idx++;
   }
 
@@ -319,7 +322,7 @@ uint16_t str2uint(char *buf, uint16_t *idx) {
 
 
 bool isDigit(char c) { 
-  if (c < '0' || c > '9') {
+  if (c < '0' || c > '9') { // ASCII comparison
     return false;
   }
 
@@ -444,7 +447,7 @@ void setP029(bool high) {
 void copySongName(char *buf) {
   uint8_t i = 0;
 
-  while (buf[i] != '\0' && buf[i] != ':' && i < 17) {
+  while (buf[i] != ':' && i < 17) {
     currentSongName[i] = buf[i];
     i++;
   }
@@ -466,7 +469,8 @@ void showSongName() {
   u8g2.sendBuffer();
 }
 
-
+ // active low (if button pressed the value of the register is 0 -> returns true).
+ // Datasheet: PIN[i] (i=0...31). Button is PIN[3]
 bool buttonPressed() {
   return (NRF_P0->IN & (1UL << 3)) == 0;
 }
