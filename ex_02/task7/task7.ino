@@ -14,6 +14,7 @@
 
 #define MAX_MELODY_LEN 100
 
+// For mapping
 const char noteNames[] = {'c', 'C', 'd', 'D', 'e', 'f', 'F', 'g', 'G', 'a', 'A', 'b'};
 const uint16_t notes[] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494};
 
@@ -81,7 +82,6 @@ bool parseRTTLNote(char *buf, uint16_t *idx);
 uint16_t freqFromNote(char note, bool sharp);
 uint16_t str2uint(char *buf, uint16_t *idx);
 bool isDigit(char c);
-char lowerChar(char c);
 void setBuzzerFreq(uint32_t freq);
 void showSongName();
 void copySongName(char *buf);
@@ -148,8 +148,8 @@ void playRTTTL() {
   }
 }
 
-// with a little Help of ChatGPT for debugging
-// in function parseRTTTL and parseRTTLNote
+// with a little help of ChatGPT for parsing, but mostly our brainpower;
+// for other functions, we used the work from previous exercises
 void parseRTTTL(char *buf) {
   uint16_t idx = 0;
 
@@ -169,7 +169,7 @@ void parseRTTTL(char *buf) {
   }
 
   while (buf[idx] != '\0' && *(buf + idx) != ':') {
-    char param = lowerChar(buf[idx]);
+    char param = buf[idx];
     idx++;
 
     if (buf[idx] == '=') {
@@ -256,8 +256,13 @@ bool parseRTTLNote(char *buf, uint16_t *idx) {
     }
   }
 
-  uint32_t durationMs = 240000UL / ((uint32_t)standardBPM * noteDuration);
+  // determines the speed of the song as specified in the exercise sheet
+  // uint32_t durationMs = 480000UL / ((uint32_t)standardBPM * noteDuration); // half the speed
+  // uint32_t durationMs = 240000UL / ((uint32_t)standardBPM * noteDuration);
 
+  uint32_t durationMs = 120000UL / ((uint32_t)standardBPM * noteDuration);
+
+  // add half a note
   if (buf[*idx] == '.') {
     durationMs += durationMs / 2;
     *idx = *idx + 1;
@@ -275,6 +280,7 @@ bool parseRTTLNote(char *buf, uint16_t *idx) {
 }
 
 
+// mapping the chars to a frequency
 uint16_t freqFromNote(char note, bool sharp) {
   int8_t noteIdx = -1;
 
@@ -327,15 +333,6 @@ bool isDigit(char c) {
   }
 
   return true;
-}
-
-
-char lowerChar(char c) {
-  if (c >= 'A' && c <= 'Z') {
-    return c + 32;
-  }
-
-  return c;
 }
 
 
