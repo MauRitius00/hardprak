@@ -131,7 +131,7 @@ void loop() {
 
 }
 
-
+// parse current RTTTL string and start melody
 void playRTTTL() {
   setTimer2(false);
   setBuzzerFreq(0);
@@ -153,6 +153,7 @@ void playRTTTL() {
 void parseRTTTL(char *buf) {
   uint16_t idx = 0;
 
+  // reset RTTTL standard values
   standardDuration = 4;
   standardOctave = 6;
   standardBPM = 63;
@@ -160,14 +161,17 @@ void parseRTTTL(char *buf) {
 
   copySongName(buf);
 
+  // skip song name
   while (*(buf + idx) != '\0' && buf[idx] != ':') {
     idx++;
   }
 
+  // skip ':'
   if (buf[idx] == ':') {
     idx++;
   }
 
+  // parse default parameters for this rington
   while (buf[idx] != '\0' && *(buf + idx) != ':') {
     char param = buf[idx];
     idx++;
@@ -191,10 +195,12 @@ void parseRTTTL(char *buf) {
     }
   }
 
+  // skip ':'
   if (*(buf + idx) == ':') {
     idx++;
   }
 
+  // parse all notes of the melody
   while (buf[idx] != '\0' && melodyLen < MAX_MELODY_LEN) {
     if (!parseRTTLNote(buf, &idx)) {
       break;
@@ -325,6 +331,7 @@ uint16_t str2uint(char *buf, uint16_t *idx) {
 }
 
 
+// checks if char c is a digit
 bool isDigit(char c) { 
   if (c < '0' || c > '9') { // ASCII comparison
     return false;
@@ -438,18 +445,21 @@ void setP029(bool high) {
   }
 }
 
-
+// copy song name from an RTTTL string to currentSongName
 void copySongName(char *buf) {
   uint8_t i = 0;
 
+  // copy characters until ':'
   while (buf[i] != ':' && i < 17) {
     currentSongName[i] = buf[i];
     i++;
   }
 
+  // terminate string
   currentSongName[i] = '\0';
 
   if (i == 0) {
+    // placeholder if empty
     currentSongName[0] = '-';
     currentSongName[1] = '\0';
   }
@@ -457,6 +467,7 @@ void copySongName(char *buf) {
 
 
 void showSongName() {
+  // show current song name on display
   u8g2.clearBuffer();
   u8g2.drawStr(0, 12, "Current song:");
   u8g2.drawStr(0, 28, currentSongName);

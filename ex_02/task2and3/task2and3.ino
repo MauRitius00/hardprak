@@ -1,7 +1,11 @@
 #include <Arduino.h>
 
 // ------------------------------------------------------------
-// Task 2 and 3:
+//  Task 2 and 3:
+//      Write the body of setTimer1Freq() as specified in the exercise sheet.
+//      This should include timer settings.
+//      Implement the ISR in TIMER1_IRQHandler().
+//      Make necessary changes for setBuzzerFreq()
 // ------------------------------------------------------------
 
 // YOU HAVE TO PRESS THE BUTTON TO HEAR THE SOUND!! 
@@ -19,7 +23,7 @@ void setup() {
   NRF_P0->DIRSET = (1UL << 29);
   NRF_P0->OUTCLR = (1UL << 29);
 
-  // initialize Button as aktive low
+  // initialize Button as active low
 
   // set correct binary value in register for button
   // 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0
@@ -70,6 +74,8 @@ void setP029(bool high) {
 void setBuzzerFreq() {
   // True if button pressed
   bool buttonPressed = ((NRF_P0->IN & (1UL << 3)) == 0);
+
+  // Toggle buzzer if button pressed
 
   if (buttonPressed && !buzzerRunning) {
     currentToggleState = false;

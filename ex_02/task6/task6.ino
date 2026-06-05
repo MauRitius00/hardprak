@@ -50,18 +50,21 @@ extern "C" void TIMER2_IRQHandler() {
   if (NRF_TIMER2->EVENTS_COMPARE[0]) {
     NRF_TIMER2->EVENTS_COMPARE[0] = 0;
 
+    // increment timer tCount
     tCount++;
     if ((tCount % 1000) == (0)) { 
       Serial.println(tCount);
     }
 
+    // if duration of the current frequency is reached
+    // change to next frequency
     if (tCount >= durations[melodyIdx]) {
       tCount = 0;
       melodyIdx++;
 
       if (melodyIdx >= 10) {
-        setBuzzerFreq(0);   // Buzzer aus
-        setTimer2(false);   // Melodie-Timer aus
+        setBuzzerFreq(0);   // Buzzer off
+        setTimer2(false);   // Melodie-Timer off
       } else {
         setBuzzerFreq(notes[melodyIdx]);
       }
@@ -136,7 +139,7 @@ void setP029(bool high) {
 }
 
 void setBuzzerFreq(uint32_t freq) {
-
+  // set the frequency of the buzzer to freq
   if ((100 <= freq) && (freq <= 3000)){
     NRF_TIMER1->CC[0] = 1000000UL / (2UL * freq);
     NVIC_ClearPendingIRQ(TIMER1_IRQn);
@@ -144,6 +147,7 @@ void setBuzzerFreq(uint32_t freq) {
     NRF_TIMER1->TASKS_START = 1;
   }
   else {
+    // deactivate buzzer if freq out of range
     setP029(false);
     NRF_TIMER1->TASKS_STOP = 1;
   }

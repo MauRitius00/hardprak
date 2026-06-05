@@ -98,7 +98,7 @@ void setP029(bool high) {
 }
 
 void setBuzzerFreq(uint32_t freq) {
-
+  // set the frequency of the buzzer to freq
   if ((100 <= freq) && (freq <= 3000)){
     NRF_TIMER1->CC[0] = 1000000UL / (2UL * freq);
     NVIC_ClearPendingIRQ(TIMER1_IRQn);
@@ -106,6 +106,7 @@ void setBuzzerFreq(uint32_t freq) {
     NRF_TIMER1->TASKS_START = 1;
   }
   else {
+    // deactivate buzzer if freq out of range
     setP029(false);
     NRF_TIMER1->TASKS_STOP = 1;
   }
