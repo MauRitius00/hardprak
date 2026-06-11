@@ -34,7 +34,7 @@ const char* categorize(int normalized) {
 
 void setup() {
     // TODO: initialize Serial communication
-    Serial.begin(BaudRate);
+    Serial.begi(BaudRate);
     while (!Serial);
 
     // TODO: configure ADC resolution to 12-bit
