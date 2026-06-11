@@ -73,8 +73,6 @@ const int LightMax = 3500; // Sensor can only read to ~2500 (350 lux)
 // ------------------------------------------------------------
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
-
-
 // --- FSM ---
 enum SystemState {
     STATE_INIT,
@@ -107,12 +105,23 @@ void display_values() {
   // ------------------------------------------------------------
   // TODO (Task 3): set cursor, print co2 and tvoc values.
   u8g2.clearBuffer();
+  u8g2.print(stateNames[currentState]);
+
 
   u8g2.setCursor(0, 10);
   u8g2.print("SysState: ");
   u8g2.print(stateNames[currentState]);
 
   u8g2.setCursor(0, 20);
+  u8g2.print("Temp. [C]: ");
+  u8g2.print(tempVal);
+
+  u8g2.setCursor(0, 30);
+  u8g2.print("Humidity [%]: ");
+  u8g2.print(humidVal);
+
+  u8g2.setCursor(0, 40);
+  u8g2.print("Light Level [%]: ");
   u8g2.print("Temp. [C]: ");
   u8g2.print(tempVal);
 
@@ -129,7 +138,6 @@ void display_values() {
   u8g2.print(eCo2val);
   
   u8g2.sendBuffer();
-
   displayLight();
 }
 
@@ -139,10 +147,6 @@ void displayLight() {
         digitalWrite(LED_GREEN, LOW);
     } else {
         int currentDelay;
-    sgp.softReset();
-
-    dht.begin();
-
         if (currentState == STATE_ATTENTION) {
             currentDelay = LEDDelayAttention;
         } else {
