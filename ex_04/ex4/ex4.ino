@@ -15,7 +15,7 @@
 // =====================
 // Part E: BLE Library
 // =====================
-// #include <ArduinoBLE.h>
+#include <ArduinoBLE.h>
 
 LSM6DS3 myIMU(I2C_MODE, 0x6A);
 
@@ -56,7 +56,8 @@ String lastDynamicGesture = "NONE";
 // Example:
 // BLEService imuService("180C");
 // BLECharacteristic imuCharacteristic("2A56", BLERead | BLENotify, 100);
-
+BLEService imuService("180C");
+BLECharacteristic imuCharacteristic("2A56", BLERead | BLENotify, 150);
 
 // =====================
 // Part B: Orientation Detection
@@ -123,21 +124,21 @@ String detectDynamicGesture(float gyrX, float gyrY, float gyrZ) {
   // Return strongest gesture (highest magnitude)
 
   
-  // größter Wert mit absolutem Wert größer 100
+  // largest value with an absolute value greater than 100
   if (abs(gyrX) > 100 && abs(gyrX) > abs(gyrY) && abs(gyrX) > abs(gyrZ)) {
-    // gyrX ist am größten
+    // gyrX is the largest value
     if (gyrX < 0)
       return "TILT_LEFT";
     else
       return "TILT_RIGHT";
   } else if (abs(gyrY) > 100 && abs(gyrY) > abs(gyrX) && abs(gyrY) > abs(gyrZ)) {
-    // gyrY ist am größten
+    // gyrY is the largest value
     if (gyrY < 0)
       return "MOVE_DOWN";
     else
       return "MOVE_UP";
   } else if (abs(gyrZ) > 100 && abs(gyrZ) > abs(gyrX) && abs(gyrZ) > abs(gyrY)) {
-    // gyrZ ist am größten
+    // gyrZ is the largest value
     if (gyrZ < 0)
       return "MOVE_RIGHT";
     else
@@ -183,10 +184,22 @@ void setup() {
   // Part E: BLE Setup
   // =====================
   // TODO: Initialize BLE, add service/characteristic, start advertising
+  if (!BLE.begin()) {
+        Serial.println("[ERROR] BLE init failed");
+    }
+    BLE.setLocalName("IMU_ex4");
+    BLE.setAdvertisedService(imuService);
+    imuService.addCharacteristic(imuCharacteristic);
+    BLE.addService(imuService);
+    BLE.advertise();
+    Serial.println("[BLE] Advertising...");
 }
 
 
 void loop() {
+  // maintain BLE stack
+  BLE.poll();
+
   if (millis() > last_interval_ms + INTERVAL_MS) {
     last_interval_ms = millis();
 
@@ -239,7 +252,7 @@ void loop() {
     // =====================
     // TODO: Call detectDynamicGesture()
     // TODO: If gesture detected (not "NONE"), store in lastDynamicGesture
-    String dynamicGesture = detectDynamicGesture(gyrX, gyrY, gyrX); 
+    String dynamicGesture = detectDynamicGesture(gyrX, gyrY, gyrZ); 
 
     if (!dynamicGesture.equals("NONE"))
       lastDynamicGesture = dynamicGesture;
@@ -273,5 +286,21 @@ void loop() {
     // - Gyroscope readings (gyrX, gyrY, gyrZ)
     // - Orientation detection result
     // - Gesture detection results (FSM and Gyro)
+
+    BLEDevice central = BLE.central();
+
+    if (central) {
+      char buf[150];
+
+      snprintf(buf, sizeof(buf), "ax: %.2f | ay: %.2f | az: %.2f | gyrX: %.2f | gyrY: %.2f | gyrZ: %.2f | Orientation: %s | FSM Gesture: %s | Gyro Gesture: %s",
+              ax, ay, az,
+              gyrX, gyrY, gyrZ,
+              orientation.c_str(),
+              lastDetectedGesture.c_str(),
+              lastDynamicGesture.c_str());
+
+      imuCharacteristic.writeValue(buf);
+    }
+    
   }
 }
